@@ -1,26 +1,66 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateAlumnoDto } from './dto/create-alumno.dto';
 import { UpdateAlumnoDto } from './dto/update-alumno.dto';
+import { Alumno } from './entities/alumno.entity';
+
 
 @Injectable()
 export class AlumnoService {
-  create(createAlumnoDto: CreateAlumnoDto) {
-    return 'This action adds a new alumno';
+
+  constructor(
+    @InjectRepository(Alumno)
+    private alumnoRepositorio: Repository<Alumno>
+  ) { }
+  async create(createAlumnoDto: CreateAlumnoDto) {
+      try {
+        const crearAlumno = await this.alumnoRepositorio.create(createAlumnoDto)
+        await this.alumnoRepositorio.save(crearAlumno)
+      } catch (error) {
+        throw new BadRequestException('No se pudo agregar el alumno')
+      }
   }
 
   findAll() {
-    return `This action returns all alumno`;
+    return this.alumnoRepositorio.find()
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} alumno`;
+  async findOne(id: string) {
+    let buscarUno: Alumno
+    buscarUno = await this.alumnoRepositorio.findOneById(id)
+    if (!buscarUno) {
+      throw new NotFoundException('Alumno no encontrado')
+    }
+    return buscarUno
   }
 
-  update(id: number, updateAlumnoDto: UpdateAlumnoDto) {
-    return `This action updates a #${id} alumno`;
+  
+
+  async update(id: string, updateAlumnoDto: UpdateAlumnoDto) {
+    const actualizarAlumno = await this.alumnoRepositorio.findOne({
+      where: { id }
+    })
+    if (!actualizarAlumno) {
+      throw new NotFoundException('No se pudo actualizar porque no existe')
+    }
+    return this.alumnoRepositorio.save({
+      ...actualizarAlumno,
+      ...updateAlumnoDto
+    })
+ 
+
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} alumno`;
+  async remove(id: string) {
+    const eliminarAlumno = await this.alumnoRepositorio.findOne({
+      where: { id }
+    })
+    if (!eliminarAlumno) {
+      throw new NotFoundException('No se pudo eliminar porque no existe')
+    }
+    return this.alumnoRepositorio.remove({
+      ...eliminarAlumno
+    })
   }
 }

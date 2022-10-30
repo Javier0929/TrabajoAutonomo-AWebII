@@ -1,20 +1,13 @@
+import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
-import {Prop, SchemaFactory, Schema } from "@nestjs/mongoose"
-import { ObjectId } from "mongoose"
-
-
-@Schema()
+@Entity()
 export class Alumno {
+    @PrimaryGeneratedColumn('uuid')
+    id: string
 
-    id: ObjectId
+    @Column()
+    nombre: string
 
-
-    @Prop()
-    Nombre: string
-
-    @Prop()
-    Identificacion: string
-  
+    @Column()
+    identificacion: number
 }
-
-export const SchemaAlumno= SchemaFactory.createForClass(Alumno)
