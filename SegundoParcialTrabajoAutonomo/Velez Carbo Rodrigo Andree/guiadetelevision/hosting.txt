@@ -1,2 +1,0 @@
-trabajoautonomoarauz-production.up.railway.app  backend
-https://venerable-nougat-1978ad.netlify.app/    frontend
